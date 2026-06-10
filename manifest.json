@@ -1,0 +1,16 @@
+{
+    "name": "Museum Vitrine",
+    "short_name": "Museum",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#2c1810",
+    "theme_color": "#2c1810",
+    "icons": [
+        {
+            "src": "bilder/bild1.jpg",
+            "sizes": "192x192",
+            "type": "image/jpeg"
+        }
+    ]
+}

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Museum Vitrine</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: #2c1810;
+            background-image: 
+                linear-gradient(to bottom, rgba(44, 24, 16, 0.85), rgba(44, 24, 16, 0.7)),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 120px,
+                    #1a0f0a 120px,
+                    #1a0f0a 125px
+                ),
+                linear-gradient(90deg, #3d2217 0%, #5c3a2a 20%, #4a2e1f 40%, #5c3a2a 60%, #3d2217 80%, #5c3a2a 100%);
+            background-size: cover;
+            color: #f4e4c1;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100dvh;
+            padding: 20px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Startseite */
+        #start-screen {
+            text-align: center;
+        }
+
+        #start-screen h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            color: #f4e4c1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+        }
+
+        #start-screen p {
+            font-size: 1.1em;
+            margin-bottom: 40px;
+            color: #c4a882;
+            font-style: italic;
+        }
+
+        .btn {
+            padding: 18px 50px;
+            font-size: 1.4em;
+            font-family: 'Georgia', serif;
+            border: 2px solid #c4a882;
+            background: linear-gradient(to bottom, #5c3a2a, #3d2217);
+            color: #f4e4c1;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: all 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        /* Spiel-Screen */
+        #game-screen {
+            justify-content: space-between;
+            padding: 30px 20px;
+        }
+
+        .progress {
+            font-size: 1em;
+            color: #c4a882;
+            letter-spacing: 1px;
+        }
+
+        .image-frame {
+            border: 6px solid #8b6914;
+            border-radius: 4px;
+            box-shadow: 
+                0 0 0 2px #5c3a2a,
+                0 8px 30px rgba(0,0,0,0.5),
+                inset 0 0 20px rgba(0,0,0,0.3);
+            background: #1a0f0a;
+            padding: 8px;
+            max-width: 85vw;
+            max-height: 50vh;
+        }
+
+        .image-frame img {
+            display: block;
+            width: 100%;
+            max-height: 45vh;
+            object-fit: contain;
+            border-radius: 2px;
+        }
+
+        .choices {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .choice-btn {
+            flex: 1;
+            padding: 16px 10px;
+            font-size: 1.1em;
+            font-family: 'Georgia', serif;
+            border: 2px solid #c4a882;
+            border-radius: 8px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .choice-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-depot {
+            background: linear-gradient(to bottom, #4a4a4a, #2d2d2d);
+            color: #ccc;
+        }
+
+        .btn-vitrine {
+            background: linear-gradient(to bottom, #8b6914, #6b4f10);
+            color: #f4e4c1;
+        }
+
+        /* Ergebnis-Screen */
+        #result-screen {
+            justify-content: flex-start;
+            padding-top: 40px;
+            overflow-y: auto;
+            gap: 20px;
+        }
+
+        #result-screen h2 {
+            font-size: 2em;
+            color: #f4e4c1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .vitrine-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+            padding-bottom: 20px;
+        }
+
+        .vitrine-grid img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border: 4px solid #8b6914;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .empty-message {
+            font-style: italic;
+            color: #c4a882;
+            font-size: 1.1em;
+            margin: 40px 0;
+        }
+
+        .restart-btn {
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* Ornament-Dekoration */
+        .ornament {
+            font-size: 1.5em;
+            color: #8b6914;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Startseite -->
+    <div id="start-screen" class="screen active">
+        <h1>⚜️ Museum ⚜️</h1>
+        <p>Wähle Gegenstände für deine Vitrine</p>
+        <div class="ornament">═══════════</div>
+        <br>
+        <button class="btn" onclick="startGame()">Los</button>
+    </div>
+
+    <!-- Spiel-Screen -->
+    <div id="game-screen" class="screen">
+        <div class="progress" id="progress">1 / 12</div>
+        <div class="image-frame">
+            <img id="current-image" src="" alt="Museumsgegenstand">
+        </div>
+        <div class="choices">
+            <button class="choice-btn btn-depot" onclick="choose('depot')">Depot</button>
+            <button class="choice-btn btn-vitrine" onclick="choose('vitrine')">Vitrine</button>
+        </div>
+    </div>
+
+    <!-- Ergebnis-Screen -->
+    <div id="result-screen" class="screen">
+        <h2>⚜️ Deine Vitrine ⚜️</h2>
+        <div class="vitrine-grid" id="vitrine-grid"></div>
+        <button class="btn restart-btn" onclick="restart()">Neu starten</button>
+    </div>
+
+    <script>
+        // Bilder-Array – passe die Dateinamen an deine Bilder an
+        const bilder = [
+            'bilder/bild1.jpg',
+            'bilder/bild2.jpg',
+            'bilder/bild3.jpg',
+            'bilder/bild4.jpg',
+            'bilder/bild5.jpg',
+            'bilder/bild6.jpg',
+            'bilder/bild7.jpg',
+            'bilder/bild8.jpg',
+            'bilder/bild9.jpg',
+            'bilder/bild10.jpg',
+            'bilder/bild11.jpg',
+            'bilder/bild12.jpg'
+        ];
+
+        let currentIndex = 0;
+        let vitrineChoices = [];
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startGame() {
+            currentIndex = 0;
+            vitrineChoices = [];
+            showImage();
+            showScreen('game-screen');
+        }
+
+        function showImage() {
+            document.getElementById('current-image').src = bilder[currentIndex];
+            document.getElementById('progress').textContent = (currentIndex + 1) + ' / 12';
+        }
+
+        function choose(choice) {
+            if (choice === 'vitrine') {
+                vitrineChoices.push(bilder[currentIndex]);
+            }
+
+            currentIndex++;
+
+            if (currentIndex >= 12) {
+                showResults();
+            } else {
+                showImage();
+            }
+        }
+
+        function showResults() {
+            const grid = document.getElementById('vitrine-grid');
+            grid.innerHTML = '';
+
+            if (vitrineChoices.length === 0) {
+                grid.innerHTML = '<p class="empty-message">Du hast keine Gegenstände ausgewählt.</p>';
+            } else {
+                vitrineChoices.forEach(src => {
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = 'Vitrinen-Objekt';
+                    grid.appendChild(img);
+                });
+            }
+
+            showScreen('result-screen');
+        }
+
+        function restart() {
+            showScreen('start-screen');
+        }
+
+        // Service Worker registrieren
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
