@@ -1,4 +1,4 @@
-const CACHE_NAME = 'museum-v1';
+const CACHE_NAME = 'museum-v2';
 const ASSETS = [
     './',
     './index.html',
